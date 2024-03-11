@@ -18,6 +18,10 @@ const reactionSchema = new mongoose.Schema({
         minLength: 1,
         maxLength: 25,
     },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'user',
+    },
     createdAt: {
         type: Date,
         default: Date.now,

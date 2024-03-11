@@ -45,7 +45,10 @@ module.exports = {
     },
     async deleteUser(req, res) {
         try {
-            const deletedUser = await User.findOneAndDelete({ id: req.params.id });
+            const deletedUser = await User.findOneAndDelete({ _id: req.params.userId });
+            if (!deletedUser) {
+                return res.status(404).json({ message: "No user found with that ID" });
+            }
             res.status(200).json(deletedUser);
         } catch (err) {
             res.status(500).json(err);
@@ -60,7 +63,7 @@ module.exports = {
                 res.status(404).json({ message: 'No user found with that ID' });
             }
             const updatedUser = await User.findOneAndUpdate(
-                { _id: req.params.id },
+                { _id: req.params.userId },
                 { $push: { friends: req.params.friendId } }
             );
             if (!updatedUser) {
@@ -75,16 +78,17 @@ module.exports = {
     },
     async deleteFriend(req, res) {
         try {
+            // Searching for the friend first
             const deletedFriend = await User.findOne({_id: req.params.friendId});
             if (!deletedFriend) {
-                res.status(404).json({ message: 'No user found with that ID'});
+                return res.status(404).json({ message: 'No user found with that ID'});
             }
             const updatedUser = await User.findOneAndUpdate(
                 {_id: req.params.userId},
                 { $pull: { friends: req.params.friendId }}
             );
             if (!updatedUser) {
-                res.status(404).json({ message: 'No user found with that ID' });
+                return res.status(404).json({ message: 'No user found with that ID' });
             }
             res.status(200).json(updatedUser);
         } catch(err) {
